@@ -18,63 +18,63 @@ const seedProducts = [
 		"brand": "Hollister",
 		"price": 750000,
 		"color": "biru muda",
-		"size": "S"
+		"category": "Baju"
 	},
 	{
 		"name": "Celana Chino",
 		"brand": "Levi's",
 		"price": 900000,
 		"color": "krem",
-		"size": "XL"
+		"category": "Celana"
 	},
 	{
 		"name": "Sweater",
 		"brand": "Gap",
 		"price": 650000,
 		"color": "merah muda",
-		"size": "L"
+		"category": "Jaket"
 	},
 	{
 		"name": "Tas Ransel",
 		"brand": "Herschel",
 		"price": 1500000,
 		"color": "biru",
-		"size": "M"
+		"category": "Aksesoris"
 	},
 	{
 		"name": "Kacamata Aviator",
 		"brand": "Ray-Ban",
 		"price": 2000000,
 		"color": "emas",
-		"size": "S"
+		"category": "Aksesoris"
 	},
 	{
 		"name": "Baju Renang",
 		"brand": "Speedo",
 		"price": 500000,
 		"color": "biru tua",
-		"size": "XL"
+		"category": "Baju"
 	},
 	{
 		"name": "Topi Baseball",
 		"brand": "New Era",
 		"price": 350000,
 		"color": "hitam",
-		"size": "M"
+		"category": "Aksesoris"
 	},
 	{
 		"name": "Rompi",
 		"brand": "Zara",
 		"price": 850000,
 		"color": "abu-abu",
-		"size": "L"
+		"category": "Baju"
 	},
 	{
 		"name": "Jas",
 		"brand": "Hugo Boss",
 		"price": 4500000,
 		"color": "hitam",
-		"size": "S"
+		"category": "Baju"
     }
 	
 ]
