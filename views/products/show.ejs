@@ -12,8 +12,9 @@
         <li>Brand:  <%= product.brand %></li>
         <li>Color: <%= product.color %></li>
         <li>Price: Rp <%= product.price %></li>
-        <li>size: Rp <%= product.size %></li>
+        <li>Kategori: <%= product.category %></li>
     </ul>
+    <a href="/products/<%= product._id %>/edit">Edit Product</a>
     <a href="/products/">Back</a>
 </body>
 </html>
