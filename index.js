@@ -23,6 +23,12 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
+function wrapAsync(fn){
+    return function(req, res, next){
+        fn(req, res, next).catch(err => next(err));
+    }
+}
+
 app.get('/', (req, res) => {
     res.send('Hello, World!');
 });
@@ -54,49 +60,33 @@ app.post('/products', async (req, res) => {
 });
 
 // argument next ditambahin supaya bisa ngejalanin err handler
-app.get('/products/:id', async (req, res, next) => {
-    try {
-        const {id} = req.params;
-        const product = await Product.findById(id);
-        res.render('products/show', { product });
+app.get('/products/:id', wrapAsync(async (req, res) => {
+    const {id} = req.params;
+    const product = await Product.findById(id);
+    res.render('products/show', { product });
 
-    } catch (error) {
-        next(new ErrorHandler('Product tidak ditemukan!', 404));
-    }
-});
+}));
 
-app.get('/products/:id/edit', async (req, res, next) => {
-    try{
-        const {id} = req.params;
-        const product = await Product.findById(id);
-        res.render('products/edit', { product });
+app.get('/products/:id/edit', wrapAsync(async (req, res, next) => {
+    const {id} = req.params;
+    const product = await Product.findById(id);
+    res.render('products/edit', { product });
 
-    } catch(err){
-        next(new ErrorHandler('Product tidak ditemukan!', 404));
-    }
-});
+}));
 
-app.put('/products/:id', async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true });
-        res.redirect(`${product._id}`);
-        
-    } catch (error) {
-        next(new ErrorHandler('Gagal update data!', 412));
-    }
-});
+app.put('/products/:id', wrapAsync(async (req, res, next) => {
+    const { id } = req.params;
+    const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true });
+    res.redirect(`${product._id}`);
+    
+}));
 
-app.delete('/products/:id', async (req, res, next) => {
-    try {
+app.delete('/products/:id', wrapAsync(async (req, res, next) => {
         const { id } = req.params;
         await Product.findByIdAndDelete( id );
         res.redirect('/products');
         
-    } catch (error) {
-        next(new ErrorHandler('Gagal menghapus data: Product tidak ditemukan', 412));
-    }
-});
+}));
 
 // middleware error handler
 app.use((err, req, res, next) => {
