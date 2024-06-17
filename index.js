@@ -52,12 +52,12 @@ app.get('/products/create', (req, res) => {
     res.render('products/create');
 });
 
-app.post('/products', async (req, res) => {
+app.post('/products', wrapAsync(async (req, res) => {
     console.log(req.body);
     const product = new Product(req.body);
     await product.save();
     res.redirect(`products/${product._id}`);
-});
+}));
 
 // argument next ditambahin supaya bisa ngejalanin err handler
 app.get('/products/:id', wrapAsync(async (req, res) => {
@@ -82,11 +82,25 @@ app.put('/products/:id', wrapAsync(async (req, res, next) => {
 }));
 
 app.delete('/products/:id', wrapAsync(async (req, res, next) => {
-        const { id } = req.params;
-        await Product.findByIdAndDelete( id );
-        res.redirect('/products');
+    const { id } = req.params;
+    await Product.findByIdAndDelete( id );
+    res.redirect('/products');
         
 }));
+
+app.use((err, req, res, next) => {
+    // console.dir(err); // buat mastiin erornya apa
+    if(err.name === "ValidationError"){
+        err.status = 400;
+        err.message = Object.values(err.errors).map(err => err.message);
+    }
+    if(err.name === 'CastError'){
+        err.status = 404;
+        err.message = 'Product Not Found!';
+        
+    }
+    next(err);
+});
 
 // middleware error handler
 app.use((err, req, res, next) => {
