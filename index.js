@@ -50,7 +50,40 @@ app.post('/garments', wrapAsync(async (req, res) => {
     res.redirect(`/garments/`);
 }));
 
+app.get('/garments/:id', wrapAsync(async (req, res) => {
+    const garment = await Garment.findById(req.params.id).populate('products'); //jgn lupa populate()
+    res.render('garment/show', { garment });
+}));
 
+// --- create a product (child) inside a garment (parent) ---
+// garments/:id_garment/products/create
+
+// --- Edit a product (child) inside a garment (parent) ---
+// garments/:id_garment/products/:id_product/edit
+
+// show some products inside a garment
+// garments/:id_garment/products/
+
+// show a product inside a garment
+// garments/:id_garment/products/:id_products
+
+app.get('/garments/:garment_id/products/create', (req, res) => {
+    const { garment_id } = req.params;
+    res.render('products/create', { garment_id });
+});
+
+app.post('/garments/:garment_id/products', wrapAsync(async (req, res) => {
+    const { garment_id } = req.params;
+    const garment = await Garment.findById(garment_id);
+    const product = new Product(req.body);
+    garment.products.push(product);
+    await garment.save();
+    await product.save();
+    res.redirect(`/garments/${garment_id}`);
+
+    console.log(garment);
+    console.log(product);
+}));
 
 // === products ===
 app.get('/products', async (req, res) => {
@@ -82,7 +115,7 @@ app.post('/products', wrapAsync(async (req, res) => {
 // argument next ditambahin supaya bisa ngejalanin err handler
 app.get('/products/:id', wrapAsync(async (req, res) => {
     const {id} = req.params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate('garment');
     res.render('products/show', { product });
 
 }));
@@ -109,7 +142,7 @@ app.delete('/products/:id', wrapAsync(async (req, res, next) => {
 }));
 
 app.use((err, req, res, next) => {
-    // console.dir(err); // buat mastiin erornya apa
+    console.dir(err); // buat mastiin erornya apa
     if(err.name === "ValidationError"){
         err.status = 400;
         err.message = Object.values(err.errors).map(err => err.message);

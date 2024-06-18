@@ -16,6 +16,9 @@
             Kategori: 
             <a href="/products?category=<%= product.category %>"><%= product.category %></a>
         </li>
+        <a href="/garments/<%= product.garment._id %>">
+            <li>Garment: <%= product.garment.name %></li>
+        </a>
     </ul>
     <a href="/products/<%= product._id %>/edit">Edit Product</a>
     <form action="/products/<%= product._id %>?_method=DELETE" method="post">
