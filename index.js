@@ -88,6 +88,14 @@ app.post('/garments/:garment_id/products', wrapAsync(async (req, res) => {
     console.log(product);
 }));
 
+app.delete('/garments/:garment_id', wrapAsync(async (req, res) => {
+    const { garment_id } = req.params;
+    await Garment.findOneAndDelete({ _id: garment_id });
+    res.redirect('/garments')
+}));
+
+
+// ====================================================================
 // === products ===
 app.get('/products', async (req, res) => {
     const { category } = req.query;
