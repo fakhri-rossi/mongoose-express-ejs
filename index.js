@@ -3,6 +3,8 @@ const express = require('express');
 const methodOverride = require('method-override');
 const mongoose = require('mongoose');
 const app = express();
+const session = require('express-session');
+const flash = require('connect-flash');
 const ErrorHandler = require('./ErrorHandler');
 const wrapAsync = require('./WrapAsync');
 
@@ -24,7 +26,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-
+app.use(session({
+    secret: 'secret-key',
+    resave: false,
+    saveUninitialized: false,
+}));
+app.use(flash());
 
 
 app.get('/', (req, res) => {

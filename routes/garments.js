@@ -3,6 +3,7 @@ const router = express.Router();
 const Product = require('../models/product');
 const Garment = require('../models/garment')
 const wrapAsync = require('../WrapAsync');
+const flash = require('connect-flash');
 
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://127.0.0.1/shop_db')
@@ -16,7 +17,7 @@ mongoose.connect('mongodb://127.0.0.1/shop_db')
 
 router.get('/', wrapAsync(async (req, res) => {
     const garments = await Garment.find();
-    res.render('garments/index', { garments });
+    res.render('garments/index', { garments, message: req.flash('success') });
 }));
 
 router.get('/create', (req, res) => {
@@ -26,6 +27,7 @@ router.get('/create', (req, res) => {
 router.post('/', wrapAsync(async (req, res) => {
     const garment = new Garment(req.body);
     await garment.save();
+    req.flash('success', 'Berhasil menambahkan data pabrik!');
     res.redirect(`/garments`);
 }));
 
