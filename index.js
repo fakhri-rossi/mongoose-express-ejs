@@ -33,6 +33,10 @@ app.use(session({
 }));
 app.use(flash());
 
+app.use((req, res, next) => {
+    res.locals.flashMessage = req.flash('flashMessage');
+});
+
 
 app.get('/', (req, res) => {
     res.render('index');
