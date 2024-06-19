@@ -4,6 +4,7 @@ const methodOverride = require('method-override');
 const mongoose = require('mongoose');
 const app = express();
 const ErrorHandler = require('./ErrorHandler');
+const wrapAsync = require('./WrapAsync');
 
 // models
 const Product = require('./models/product');
@@ -24,133 +25,16 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
-function wrapAsync(fn){
-    return function(req, res, next){
-        fn(req, res, next).catch(err => next(err));
-    }
-}
+
 
 app.get('/', (req, res) => {
-    res.send('Hello, World!');
+    res.render('index');
 });
 
-// === garment ===
-app.get('/garments', wrapAsync(async (req, res) => {
-    const garments = await Garment.find();
-    res.render('garment/index', { garments });
-}));
 
-app.get('/garments/create', (req, res) => {
-    res.render('garment/create');
-});
-
-app.post('/garments', wrapAsync(async (req, res) => {
-    const garment = new Garment(req.body);
-    await garment.save();
-    res.redirect(`/garments/`);
-}));
-
-app.get('/garments/:id', wrapAsync(async (req, res) => {
-    const garment = await Garment.findById(req.params.id).populate('products'); //jgn lupa populate()
-    res.render('garment/show', { garment });
-}));
-
-// --- create a product (child) inside a garment (parent) ---
-// garments/:id_garment/products/create
-
-// --- Edit a product (child) inside a garment (parent) ---
-// garments/:id_garment/products/:id_product/edit
-
-// show some products inside a garment
-// garments/:id_garment/products/
-
-// show a product inside a garment
-// garments/:id_garment/products/:id_products
-
-app.get('/garments/:garment_id/products/create', (req, res) => {
-    const { garment_id } = req.params;
-    res.render('products/create', { garment_id });
-});
-
-app.post('/garments/:garment_id/products', wrapAsync(async (req, res) => {
-    const { garment_id } = req.params;
-    const garment = await Garment.findById(garment_id);
-    const product = new Product(req.body);
-    
-    garment.products.push(product);
-    product.garment = garment;
-
-    await garment.save();
-    await product.save();
-    res.redirect(`/garments/${garment_id}`);
-
-    console.log(garment);
-    console.log(product);
-}));
-
-app.delete('/garments/:garment_id', wrapAsync(async (req, res) => {
-    const { garment_id } = req.params;
-    await Garment.findOneAndDelete({ _id: garment_id });
-    res.redirect('/garments')
-}));
-
-
-// ====================================================================
-// === products ===
-app.get('/products', async (req, res) => {
-    const { category } = req.query;
-    
-    if(category){
-        const products = await Product.find({ category });
-        res.render('products/index', { products, category });
-
-    } else {
-        const products = await Product.find();
-        res.render('products/index', { products, category: 'All' });
-
-    }
-});
-
-app.get('/products/create', (req, res) => {
-    // throw new ErrorHandler('This is a custom error', 503);
-    res.render('products/create');
-});
-
-app.post('/products', wrapAsync(async (req, res) => {
-    console.log(req.body);
-    const product = new Product(req.body);
-    await product.save();
-    res.redirect(`products/${product._id}`);
-}));
-
-// argument next ditambahin supaya bisa ngejalanin err handler
-app.get('/products/:id', wrapAsync(async (req, res) => {
-    const {id} = req.params;
-    const product = await Product.findById(id).populate('garment');
-    res.render('products/show', { product });
-
-}));
-
-app.get('/products/:id/edit', wrapAsync(async (req, res, next) => {
-    const {id} = req.params;
-    const product = await Product.findById(id);
-    res.render('products/edit', { product });
-
-}));
-
-app.put('/products/:id', wrapAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true });
-    res.redirect(`${product._id}`);
-    
-}));
-
-app.delete('/products/:id', wrapAsync(async (req, res, next) => {
-    const { id } = req.params;
-    await Product.findByIdAndDelete( id );
-    res.redirect('/products');
-        
-}));
+// define routes
+app.use('/products', require('./routes/products'));
+app.use('/garments', require('./routes/garments'));
 
 app.use((err, req, res, next) => {
     console.dir(err); // buat mastiin erornya apa
@@ -164,6 +48,7 @@ app.use((err, req, res, next) => {
         
     }
     next(err);
+    
 });
 
 // middleware error handler
