@@ -35,6 +35,7 @@ app.use(flash());
 
 app.use((req, res, next) => {
     res.locals.flashMessage = req.flash('flashMessage');
+    next();
 });
 
 

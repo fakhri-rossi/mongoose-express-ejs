@@ -17,7 +17,7 @@ mongoose.connect('mongodb://127.0.0.1/shop_db')
 
 router.get('/', wrapAsync(async (req, res) => {
     const garments = await Garment.find();
-    res.render('garments/index');
+    res.render('garments/index', { garments });
 }));
 
 router.get('/create', (req, res) => {
